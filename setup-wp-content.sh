@@ -18,5 +18,4 @@ done
 chown -R www-data:www-data "$WP_CONTENT_DIR"
 
 find "$WP_CONTENT_DIR" -type d -exec chmod 755 {} \;
-
 find "$WP_CONTENT_DIR" -type f -exec chmod 644 {} \;
