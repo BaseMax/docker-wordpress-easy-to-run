@@ -19,10 +19,12 @@ Built on top of the official [`wordpress`](https://hub.docker.com/_/wordpress) i
 
 ## Using
 
+Running:
 ```
-docker compose -p site1 --env-file ../site1/.env up -d --build
-docker compose -p site2 --env-file ../site2/.env up -d --build
+docker compose -p site1 --env-file site1/.env -f template/docker-compose.yml up -d --build
+docker compose -p site2 --env-file site2/.env -f template/docker-compose.yml up -d --build
 ```
+
 
 ## 📦 Folder Structure
 
@@ -34,6 +36,8 @@ my-wordpress/
 ├── docker-compose.yml       # Defines WordPress and MariaDB services, ports, and volumes
 ├── wp-content/              # Optional: Mount your local themes, plugins, uploads here
 └── .env                     # Centralized environment config (PHP version, DB info, ports, etc.)
+
+todo structure needs to be updated
 ````
 
 ---
@@ -47,16 +51,16 @@ my-wordpress/
    cd docker-wordpress-easy-to-run
    ```
 
-2. Run WordPress:
+2. Setup your sites (Create directory for each one
 
-   ```bash
-   docker compose up --build -d
-   ```
+3. Create .env file inside each sites (`cp template/.env.example siteX/.env`)
+
+4. Run docker-compose for your site one by one
 
 3. Visit your local site:
 
    ```
-   http://localhost:9876
+   http://localhost:XXXX
    ```
 
 ---
