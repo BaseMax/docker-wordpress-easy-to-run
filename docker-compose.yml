@@ -2,7 +2,10 @@ version: "3.8"
 
 services:
   wordpress:
-    build: .
+    build:
+      context: .
+      args:
+        PHP_VERSION: ${PHP_VERSION}
     image: my-wordpress-custom:latest
     container_name: wordpress
     restart: always
@@ -10,12 +13,12 @@ services:
       - wordpress_data:/var/www/html
       - ./wp-content:/var/www/html/wp-content
     environment:
-      WORDPRESS_DB_HOST: db
-      WORDPRESS_DB_NAME: wordpress
-      WORDPRESS_DB_USER: wordpress
-      WORDPRESS_DB_PASSWORD: wordpress
+      WORDPRESS_DB_HOST: ${DATABASE_HOST}
+      WORDPRESS_DB_NAME: ${DATABASE_NAME}
+      WORDPRESS_DB_USER: ${DATABASE_USER}
+      WORDPRESS_DB_PASSWORD: ${DATABASE_PASSWORD}
     ports:
-      - "8080:80"
+      - "${PORT_HTTP}:80"
     depends_on:
       - db
 
@@ -24,10 +27,10 @@ services:
     container_name: wordpress-db
     restart: always
     environment:
-      MYSQL_DATABASE: wordpress
-      MYSQL_USER: wordpress
-      MYSQL_PASSWORD: wordpress
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: ${DATABASE_DATABASE}
+      MYSQL_USER: ${DATABASE_USER}
+      MYSQL_PASSWORD: ${DATABASE_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DATABASE_ROOT_PASSWORD}
 
 volumes:
   wordpress_data:

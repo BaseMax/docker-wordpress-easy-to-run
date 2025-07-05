@@ -13,19 +13,13 @@ if (json_last_error() !== JSON_ERROR_NONE) {
     exit(1);
 }
 
-$ioncubeKey = $phpVersion . '_ts';
-if (!isset($ioncubeJson[$ioncubeKey])) {
-    $ioncubeKey = $phpVersion;
-}
+$ioncubeKey = $phpVersion;
 if (!isset($ioncubeJson[$ioncubeKey])) {
     fwrite(STDERR, 'No ionCube loader found for PHP ' . $phpVersion . PHP_EOL);
     exit(1);
 }
 
-$sgKey = $phpVersion . 'ts';
-if (!isset($sgJson[$sgKey])) {
-    $sgKey = $phpVersion;
-}
+$sgKey = $phpVersion;
 if (!isset($sgJson[$sgKey])) {
     fwrite(STDERR, 'No SourceGuardian loader found for PHP ' . $phpVersion . PHP_EOL);
     exit(1);
