@@ -1,7 +1,7 @@
 services:
   app:
     container_name: ${PROJECT_NAME}-app
-    image: ${PROJECT_NAME}-custom:latest
+    image: ${PROJECT_NAME}-wp:latest
     build:
       context: .
       args:
