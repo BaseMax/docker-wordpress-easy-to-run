@@ -2,6 +2,8 @@ ARG PHP_VERSION=8.1
 
 FROM wordpress:php${PHP_VERSION}-apache
 
+COPY setup-php.ini $PHP_INI_DIR/conf.d/
+
 COPY setup-loaders.php /tmp/setup-loaders.php
 
 RUN apt-get update && \

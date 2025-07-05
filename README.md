@@ -17,6 +17,13 @@ Built on top of the official [`wordpress`](https://hub.docker.com/_/wordpress) i
 
 ---
 
+## Using
+
+```
+docker compose -p site1 --env-file ../site1/.env up -d --build
+docker compose -p site2 --env-file ../site2/.env up -d --build
+```
+
 ## 📦 Folder Structure
 
 ```

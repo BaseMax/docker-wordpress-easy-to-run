@@ -1,2 +1,4 @@
 .env
-wp-content
+**/root
+**/data
+**/wp-content
