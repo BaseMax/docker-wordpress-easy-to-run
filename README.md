@@ -8,7 +8,7 @@ Built on top of the official [`wordpress`](https://hub.docker.com/_/wordpress) i
 ## 🚀 Features
 
 - ✅ WordPress with PHP 8.1 (FPM + Alpine)
-- ✅ Auto-install of ionCube & SourceGuardian via [GitHub-hosted JSON](https://basemax.github.io/)
+- ✅ Auto-install of [ionCube](https://basemax.github.io/ioncube-loaders-linux-x86-64/data.json) & [SourceGuardian](https://basemax.github.io/sourceguardian-loader-linux-x86-64/data.json) via GitHub-hosted JSON.
 - ✅ MariaDB for local development
 - ✅ Clean and minimal — no `curl` or `jq` required
 - ✅ Simple and easy to run
