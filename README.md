@@ -34,7 +34,7 @@ my-wordpress/
    ```bash
    git clone https://github.com/YOUR_USERNAME/docker-wordpress-easy-to-run.git
    cd docker-wordpress-easy-to-run
-````
+   ```
 
 2. Run WordPress:
 
