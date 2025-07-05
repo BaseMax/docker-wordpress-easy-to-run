@@ -19,10 +19,12 @@ Built on top of the official [`wordpress`](https://hub.docker.com/_/wordpress) i
 
 ```
 my-wordpress/
-├── Dockerfile               # Custom PHP + loader integration
-├── docker-compose.yml       # Docker multi-service setup
-├── wp-content/              # Optional: your plugins/themes
-└── .env                     # Optional environment values
+├── Dockerfile               # Builds a custom WordPress image with ionCube + SourceGuardian loaders
+├── setup-wp-content.sh      # Ensures wp-content/ and subfolders exist with correct permissions (wp-content/uploads, etc.)
+├── setup-loaders.php        # Downloads and enables correct loader files based on PHP version (from JSON registries)
+├── docker-compose.yml       # Defines WordPress and MariaDB services, ports, and volumes
+├── wp-content/              # Optional: Mount your local themes, plugins, uploads here
+└── .env                     # Centralized environment config (PHP version, DB info, ports, etc.)
 ````
 
 ---
