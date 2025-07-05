@@ -1,119 +1,209 @@
 # 🐳 docker-wordpress-easy-to-run
 
-A production-ready Docker setup for running WordPress with support for **ionCube** and **SourceGuardian** loaders.
+A production-ready Docker setup for running WordPress with support for **ionCube** and **SourceGuardian** loaders.  
 Built on top of the official [`wordpress`](https://hub.docker.com/_/wordpress) image.
 
 ---
 
 ## 🚀 Features
 
-- ✅ WordPress with PHP 8.1 (FPM + Alpine)
-- ✅ Auto-install of [ionCube](https://basemax.github.io/ioncube-loaders-linux-x86-64/data.json) & [SourceGuardian](https://basemax.github.io/sourceguardian-loader-linux-x86-64/data.json) via GitHub-hosted JSON.
+- ✅ WordPress with PHP 8.1
+- ✅ Auto-install of [ionCube](https://basemax.github.io/ioncube-loaders-linux-x86-64/data.json) & [SourceGuardian](https://basemax.github.io/sourceguardian-loader-linux-x86-64/data.json) loaders via GitHub-hosted JSON
 - ✅ MariaDB for local development
-- ✅ Clean and minimal — no `curl` or `jq` required
-- ✅ Simple and easy to run
+- ✅ Clean and minimal
+- ✅ Simple multi-site setup using shared template and per-site env configs
 
 ![Docker Wordpress](wp.jpg)
 
 ---
 
-## Using
-
-Running:
-```
-docker compose -p site1 --env-file site1/.env -f template/docker-compose.yml up -d --build
-docker compose -p site2 --env-file site2/.env -f template/docker-compose.yml up -d --build
-```
-
-
-## 📦 Folder Structure
+## 📂 Folder Structure
 
 ```
-my-wordpress/
-├── Dockerfile               # Builds a custom WordPress image with ionCube + SourceGuardian loaders
-├── setup-wp-content.sh      # Ensures wp-content/ and subfolders exist with correct permissions (wp-content/uploads, etc.)
-├── setup-loaders.php        # Downloads and enables correct loader files based on PHP version (from JSON registries)
-├── docker-compose.yml       # Defines WordPress and MariaDB services, ports, and volumes
-├── wp-content/              # Optional: Mount your local themes, plugins, uploads here
-└── .env                     # Centralized environment config (PHP version, DB info, ports, etc.)
-
-todo structure needs to be updated
+docker-wordpress-easy-to-run/
+├── template/                  # Shared Dockerfile, docker-compose.yml, and setup scripts
+│   ├── Dockerfile
+│   ├── docker-compose.yml
+│   ├── setup-loaders.php
+│   ├── setup-php.ini
+│   └── setup-wp-content.sh
+├── sites/                     # Multiple WordPress sites, each with own data & config
+│   ├── site1/
+│   │   ├── data/              # Database volume data for site1
+│   │   ├── root/              # WordPress root files overrides for site1 (optional)
+│   │   ├── wp-content/        # Themes, plugins, uploads for site1
+│   │   └── .env               # Environment variables for site1
+│   └── site2/
+│       ├── data/
+│       ├── root/
+│       ├── wp-content/
+│       └── .env
+├── update.bat                 # Batch script to update all sites
+├── update.sh                  # Bash script to update all sites
+├── LICENSE
+├── README.md
+└── wp.jpg                    # Screenshot/example image
 ````
 
 ---
 
-## ▶️ Getting Started
+## ⚙️ Example `.env` file (per site)
 
-1. Clone this repository:
+```env
+PROJECT_NAME=site1
+WP_PORT=9876
+PMA_PORT=9877
 
-   ```bash
-   git clone https://github.com/YOUR_USERNAME/docker-wordpress-easy-to-run.git
-   cd docker-wordpress-easy-to-run
-   ```
+DATABASE_NAME=wordpress
+DATABASE_USER=wordpress
+DATABASE_PASSWORD=wordpress
+DATABASE_ROOT_PASSWORD=root
 
-2. Setup your sites (Create directory for each one
-
-3. Create .env file inside each sites (`cp template/.env.example siteX/.env`)
-
-4. Run docker-compose for your site one by one
-
-3. Visit your local site:
-
-   ```
-   http://localhost:XXXX
-   ```
+PHP_VERSION=8.1
+````
 
 ---
 
-## 🔧 Docker Commands (Cheat Sheet)
+## ▶️ How to Run Multiple Sites
 
-### 🛠 Build & Start
-
-```bash
-docker compose up --build -d       # Build and run in background
-docker compose up                  # Run and view logs (foreground)
-```
-
-### 💬 Logs
+Run each site from the main folder using:
 
 ```bash
-docker compose logs -f             # Tail all logs
-docker compose logs wordpress      # View logs from wordpress container
-docker compose logs db             # View logs from the database
+docker compose -p site1 --env-file sites/site1/.env -f template/docker-compose.yml up -d --build
+docker compose -p site2 --env-file sites/site2/.env -f template/docker-compose.yml up -d --build
 ```
 
-### 🔄 Restart / Rebuild
+You can also use the provided scripts `update.bat` (Windows) or `update.sh` (Linux/macOS) to automatically build and start all sites under `sites/`.
+
+---
+
+## How to Manage One Site at a Time
+
+Your project structure uses this pattern:
 
 ```bash
-docker compose restart             # Restart all services
-docker compose restart wordpress   # Restart just WordPress
-docker compose build --no-cache    # Force rebuild all services
+docker compose -p <project_name> --env-file sites/<project_name>/.env -f template/docker-compose.yml <command>
 ```
 
-### 🧼 Stop / Remove
+---
+
+### 1. View Logs for One Site
 
 ```bash
-docker compose stop                # Stop all containers
-docker compose down                # Stop + remove all containers
-docker compose down -v             # Also remove volumes (clean DB!)
+docker compose -p site1 --env-file sites/site1/.env -f template/docker-compose.yml logs -f
 ```
 
-### 🧹 Clean Everything
+This shows live logs (tail -f) for all containers in the `site1` project.
+
+If you want to see logs for a specific container (e.g., the WordPress app container):
 
 ```bash
-docker system prune -a             # WARNING: Removes all unused images/volumes/networks
-docker volume prune                # Remove dangling volumes
-docker container prune             # Remove stopped containers
-docker image prune                 # Remove unused images
+docker compose -p site1 --env-file sites/site1/.env -f template/docker-compose.yml logs -f site1-app
 ```
+
+---
+
+### 2. Stop One Site Completely
+
+```bash
+docker compose -p site1 --env-file sites/site1/.env -f template/docker-compose.yml down
+```
+
+This stops and removes containers, networks, but **does NOT remove volumes** (your database data remains).
+
+If you want to remove volumes (to fully clean database and cache):
+
+```bash
+docker compose -p site1 --env-file sites/site1/.env -f template/docker-compose.yml down -v
+```
+
+---
+
+### 3. Fully Delete One Site’s Data and Cache
+
+You need to delete the `sites/site1/data/` directory manually (or using your OS file manager), as that is where your MariaDB database files persist.
+
+Example for Windows (PowerShell):
+
+```powershell
+Remove-Item -Recurse -Force .\sites\site1\data\
+```
+
+On Linux/macOS terminal:
+
+```bash
+rm -rf sites/site1/data/
+```
+
+Then run:
+
+```bash
+docker compose -p site1 --env-file sites/site1/.env -f template/docker-compose.yml down -v
+```
+
+This ensures containers and volumes are removed, and the manual data folder deletion clears DB files.
+
+---
+
+### 4. Run One Site (Start or Restart)
+
+```bash
+docker compose -p site1 --env-file sites/site1/.env -f template/docker-compose.yml up -d --build
+```
+
+---
+
+## 📋 Managing Individual Sites
+
+### View logs for a site
+
+```bash
+docker compose -p site1 --env-file sites/site1/.env -f template/docker-compose.yml logs -f
+````
+
+### Stop and remove containers (keep database data)
+
+```bash
+docker compose -p site1 --env-file sites/site1/.env -f template/docker-compose.yml down
+```
+
+### Stop and remove containers and volumes (deletes database and cache)
+
+```bash
+docker compose -p site1 --env-file sites/site1/.env -f template/docker-compose.yml down -v
+```
+
+Also, manually delete the `sites/site1/data/` folder to fully remove database files.
+
+### Start or rebuild a site
+
+```bash
+docker compose -p site1 --env-file sites/site1/.env -f template/docker-compose.yml up -d --build
+```
+
+---
+
+### Note on your Errors:
+
+- `docker compose logs` needs to be run **where your docker-compose.yml file is located or you must pass `-f <file>` correctly.**
+
+- The `-p` (project name) flag must be **before** the command and **before** `-f`. Correct syntax:
+
+```bash
+docker compose -p site1 --env-file sites/site1/.env -f template/docker-compose.yml logs -f
+````
+
+(not after `logs -f`)
 
 ---
 
 ## 🧠 Tips
 
-* 🗂 Use `./wp-content/` to mount your own themes/plugins
-* 🔐 Change the DB passwords in `docker-compose.yml` before production
-* ⚠️ Don’t forget to back up `volumes` if you store real data
+* Use `sites/siteX/wp-content/` to mount themes, plugins, and uploads per site
+* Use `sites/siteX/root/` to mount root of WordPres
+* Store database files under `sites/siteX/data/` to persist DB data per site
+* Modify `.env` in each site folder to configure ports, DB credentials, and PHP version
+* Always back up your `data/` folders to avoid losing database content
 
 ---
 
