@@ -77,82 +77,6 @@ You can also use the provided scripts `update.bat` (Windows) or `update.sh` (Lin
 
 ---
 
-## How to Manage One Site at a Time
-
-Your project structure uses this pattern:
-
-```bash
-docker compose -p <project_name> --env-file sites/<project_name>/.env -f template/docker-compose.yml <command>
-```
-
----
-
-### 1. View Logs for One Site
-
-```bash
-docker compose -p site1 --env-file sites/site1/.env -f template/docker-compose.yml logs -f
-```
-
-This shows live logs (tail -f) for all containers in the `site1` project.
-
-If you want to see logs for a specific container (e.g., the WordPress app container):
-
-```bash
-docker compose -p site1 --env-file sites/site1/.env -f template/docker-compose.yml logs -f site1-app
-```
-
----
-
-### 2. Stop One Site Completely
-
-```bash
-docker compose -p site1 --env-file sites/site1/.env -f template/docker-compose.yml down
-```
-
-This stops and removes containers, networks, but **does NOT remove volumes** (your database data remains).
-
-If you want to remove volumes (to fully clean database and cache):
-
-```bash
-docker compose -p site1 --env-file sites/site1/.env -f template/docker-compose.yml down -v
-```
-
----
-
-### 3. Fully Delete One Site’s Data and Cache
-
-You need to delete the `sites/site1/data/` directory manually (or using your OS file manager), as that is where your MariaDB database files persist.
-
-Example for Windows (PowerShell):
-
-```powershell
-Remove-Item -Recurse -Force .\sites\site1\data\
-```
-
-On Linux/macOS terminal:
-
-```bash
-rm -rf sites/site1/data/
-```
-
-Then run:
-
-```bash
-docker compose -p site1 --env-file sites/site1/.env -f template/docker-compose.yml down -v
-```
-
-This ensures containers and volumes are removed, and the manual data folder deletion clears DB files.
-
----
-
-### 4. Run One Site (Start or Restart)
-
-```bash
-docker compose -p site1 --env-file sites/site1/.env -f template/docker-compose.yml up -d --build
-```
-
----
-
 ## 📋 Managing Individual Sites
 
 ### View logs for a site
@@ -194,6 +118,96 @@ docker compose -p site1 --env-file sites/site1/.env -f template/docker-compose.y
 ````
 
 (not after `logs -f`)
+
+### Export SQL Database from a Site
+
+Run this command to export the database from the site’s MariaDB container to a `.sql` file on your host machine:
+
+```bash
+docker exec -i ${PROJECT_NAME}-db mysqldump -u${DATABASE_USER} -p${DATABASE_PASSWORD} ${DATABASE_NAME} > ${PROJECT_NAME}_backup.sql
+```
+
+Example for `site1` (run from your main folder):
+
+```bash
+docker exec -i site1-db mysqldump -uwordpress -pwordpress wordpress > site1_backup.sql
+```
+
+This will create `site1_backup.sql` with a full SQL dump of the WordPress database.
+
+---
+
+### Open Bash Shell Inside WordPress or Database Container
+
+Sometimes you want to enter the container shell for debugging or manual operations.
+
+* Enter WordPress app container bash:
+
+```bash
+docker exec -it ${PROJECT_NAME}-app bash
+```
+
+Example for `site2`:
+
+```bash
+docker exec -it site2-app bash
+```
+
+* Enter MariaDB container shell (MySQL client):
+
+```bash
+docker exec -it ${PROJECT_NAME}-db bash
+```
+
+Then inside the container:
+
+```bash
+mysql -u${DATABASE_USER} -p${DATABASE_PASSWORD} ${DATABASE_NAME}
+```
+
+Example:
+
+```bash
+docker exec -it site1-db bash
+mysql -uwordpress -pwordpress wordpress
+```
+
+---
+
+### Import SQL Dump into Database
+
+If you have an SQL dump file and want to restore it into the database container, use this:
+
+```bash
+docker exec -i ${PROJECT_NAME}-db mysql -u${DATABASE_USER} -p${DATABASE_PASSWORD} ${DATABASE_NAME} < /path/to/your_dump.sql
+```
+
+Example (assuming your SQL dump is `site1_backup.sql` in your current folder):
+
+```bash
+cat site1_backup.sql | docker exec -i site1-db mysql -uwordpress -pwordpress wordpress
+```
+
+This pipes the SQL file into the container's MySQL client and restores the database.
+
+---
+
+### Summary Command Examples for `site1`
+
+```bash
+# Export DB
+docker exec -i site1-db mysqldump -uwordpress -pwordpress wordpress > site1_backup.sql
+
+# Enter WordPress app container shell
+docker exec -it site1-app bash
+
+# Enter DB container shell & MySQL client
+docker exec -it site1-db bash
+mysql -uwordpress -pwordpress wordpress
+
+# Import DB dump back to container
+cat site1_backup.sql | docker exec -i site1-db mysql -uwordpress -pwordpress wordpress
+```
 
 ---
 
