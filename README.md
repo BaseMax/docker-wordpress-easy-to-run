@@ -13,6 +13,8 @@ Built on top of the official [`wordpress`](https://hub.docker.com/_/wordpress) i
 - ✅ Clean and minimal — no `curl` or `jq` required
 - ✅ Simple and easy to run
 
+![Docker Wordpress](wp.jpg)
+
 ---
 
 ## 📦 Folder Structure
@@ -47,7 +49,7 @@ my-wordpress/
 3. Visit your local site:
 
    ```
-   http://localhost:8080
+   http://localhost:9876
    ```
 
 ---
