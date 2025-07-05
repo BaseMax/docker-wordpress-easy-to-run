@@ -1,11 +1,6 @@
-Here’s a **complete and professional `README.md`** for your GitHub repo `docker-wordpress-easy-to-run`, with a clean structure and **useful Docker commands** for development, maintenance, and cleanup.
-
----
-
-```markdown
 # 🐳 docker-wordpress-easy-to-run
 
-A production-ready Docker setup for running WordPress with support for **ionCube** and **SourceGuardian** loaders.  
+A production-ready Docker setup for running WordPress with support for **ionCube** and **SourceGuardian** loaders.
 Built on top of the official [`wordpress:php8.1-fpm-alpine`](https://hub.docker.com/_/wordpress) image.
 
 ---
